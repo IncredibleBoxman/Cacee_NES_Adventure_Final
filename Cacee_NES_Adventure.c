@@ -116,6 +116,8 @@ extern char demo_sounds[];
 
 //#link "custom_sounds.s"
 extern char custom_sounds[];
+// CREDIT FOR CUSTOM SOUNDS GOES TO TUI
+// https://forums.nesdev.com/viewtopic.php?f=6&t=20147&sid=111cfdada42e9a915581c29a7721757d
 
 
 // create easy to track tile/attr for metasprites 

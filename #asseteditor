@@ -960,7 +960,7 @@ void main() {
       
       //Make Cacee Jump
       
-      if (pad_new & PAD_A & !game_paused &&  actor_y[0] == ground)			//Prototype jumping
+      if (pad_new & PAD_A &&  actor_y[0] == ground)			//Prototype jumping
       { 
         sfx_play(6,2);
         jump = true; 
@@ -968,7 +968,7 @@ void main() {
        
         
       }
-    if (pad_new & PAD_B && !game_paused)			//Prototype jumping
+    if (pad_new & PAD_B)			//Prototype jumping
       { 
         sfx_play(8,1);
         
@@ -986,10 +986,16 @@ void main() {
     }
 
     //don't process anything in pause mode, just display latest game state
-    
+
     if(game_paused) 
     {
-      
+      //oam_id = oam_spr(100, 100, 45, 2, oam_id);
+      //oam_id = oam_spr(108, 100, 80, 2, oam_id);
+      //oam_id = oam_spr(116, 100, 65, 2, oam_id);
+      //oam_id = oam_spr(124, 100, 82, 2, oam_id);
+      //oam_id = oam_spr(132, 100, 69, 2, oam_id);
+      //oam_id = oam_spr(140, 100, 58, 2, oam_id);
+      //oam_id = oam_spr(148, 100, 58, 2, oam_id);
       continue;
     }
       

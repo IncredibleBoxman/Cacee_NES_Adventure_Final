@@ -247,6 +247,8 @@ byte actor_y[NUM_ACTORS];
 sbyte actor_dx[NUM_ACTORS];
 sbyte actor_dy[NUM_ACTORS];
 
+//shot x delta (signed)
+sbyte shot_dx;
 // thwomp x/y position
 byte thwomp_x;
 byte thwomp_y;
@@ -303,11 +305,13 @@ int level;
 char i;	// actor index
 char oam_id;	// sprite ID
 char pad;// controller flags
+char pad_new;
 
 byte ground= 200;
 byte def_ground = 200; 
 byte jumpHeight = 40;
 byte gravity = 2;
+byte shooting_dx = 2;
 byte iFrames = 0;
 // used for for loops that require int
 byte num;
@@ -806,14 +810,29 @@ void main() {
       
       	if(level == 1)
         {
+          if(!starOne)
+          {
           levelChange = true;
           twoLeft = true;
       	  levelTwo();
+          }
+          else
+          {
+            actor_x[0] == MAXX;
+          }
         }
         else if (level == 2)
         {
-          levelChange = true;
-          levelThree();
+          if(!starTwo)
+          {
+            levelChange = true;
+            levelThree();
+          }
+          else
+          {
+            actor_x[0] == MAXX;
+          }
+          
         }
         
         
@@ -922,7 +941,8 @@ void main() {
     
     
     // 1 player controller setup. 
-      pad = pad_poll(0);
+      pad_new = pad_trigger(0);
+      pad = pad_state(0);
       
       // move actor[i] left/right
       if (pad&PAD_LEFT && actor_x[0]>10) 
@@ -939,12 +959,20 @@ void main() {
       else actor_dx[0]=0;
       
       //Make Cacee Jump
-       
-      if (pad & PAD_A &&  actor_y[0] == ground)			//Prototype jumping
+      
+      if (pad_new & PAD_A &&  actor_y[0] == ground)			//Prototype jumping
       { 
         sfx_play(6,2);
         jump = true; 
         actor_dy[0]=-gravity;
+       
+        
+      }
+    if (pad_new & PAD_B)			//Prototype jumping
+      { 
+        sfx_play(8,1);
+        
+        shot_dx=shooting_dx;
        
         
       }
@@ -975,6 +1003,7 @@ void main() {
 
     }
    
+    
     
     //fall if we are above ground 
     if (actor_y[0] < ground-jumpHeight)

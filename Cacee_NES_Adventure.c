@@ -234,8 +234,8 @@ byte sprite_y1 = 100;
 byte sprite_y2 = 108;
 
 
-
-
+// pause variable
+static unsigned char game_paused;
 
 // number of actors (4 h/w sprites each)
 #define NUM_ACTORS 1
@@ -793,7 +793,7 @@ void main() {
   //load up our level 1 
   
   levelOne();
-  
+  game_paused=FALSE;
   while (game) {
     levelChange = false;
     // set our minx and maxx values
@@ -976,6 +976,28 @@ void main() {
        
         
       }
+    
+    //it start was released and then pressed, toggle pause mode
+
+    if(pad_new&PAD_START)
+    {
+      game_paused^=TRUE;
+      music_pause(game_paused);
+    }
+
+    //don't process anything in pause mode, just display latest game state
+
+    if(game_paused) 
+    {
+      //oam_id = oam_spr(100, 100, 45, 2, oam_id);
+      //oam_id = oam_spr(108, 100, 80, 2, oam_id);
+      //oam_id = oam_spr(116, 100, 65, 2, oam_id);
+      //oam_id = oam_spr(124, 100, 82, 2, oam_id);
+      //oam_id = oam_spr(132, 100, 69, 2, oam_id);
+      //oam_id = oam_spr(140, 100, 58, 2, oam_id);
+      //oam_id = oam_spr(148, 100, 58, 2, oam_id);
+      continue;
+    }
       
     
     // if we have are on top of the platform

@@ -459,6 +459,11 @@ byte num;
 // used to determine the x value of collision; 
 byte collision;
 
+//Used for moving boss
+
+byte boss_num;
+
+byte boss_num2;
 //platform struct
 typedef struct Platform{
   byte _x;		// platforms x/y positions
@@ -799,6 +804,23 @@ void levelThree()
   
 }
 
+void bossRoom()
+{
+  ppu_off();
+  clear_platforms();
+  clear_thwomp();
+  setup_graphics();
+  show_screen(Boss1_pal, Boss1_rle);
+  startingSpace(); 
+  
+  level = 4; 
+  
+}
+
+void bossMoveLeft(byte n)
+{
+  show_screen(Boss_pal_list[n], Boss_rle_list[n]);
+}
 void game_reset()
 {
   thwomp_y = def_thwomp_y;
@@ -907,7 +929,8 @@ void main() {
  
   //score = 0;
   //lives = 3; 
-  
+  boss_num = 0;
+  boss_num2 = 0;
  
  
   
@@ -968,13 +991,20 @@ void main() {
           {
             levelChange = true;
             levelThree();
-          }
-          else
-          {
-            actor_x[0] == MAXX;
-          }
-          
+          } 
         }
+      else if (level == 3)
+        {
+          if (!starThree)
+          {
+            levelChange = true;
+            bossRoom();
+          }
+        }
+      else
+      {
+        actor_x[0] == MAXX;
+      }
         
         
       }
@@ -994,6 +1024,10 @@ void main() {
           twoLeft = false;
           levelTwo();
         }
+       else
+       {
+         actor_x[0] == MINX;
+       }
         
         
         
@@ -1074,6 +1108,24 @@ void main() {
           
           oam_id = oam_meta_spr(powerup_x, powerup_y, oam_id, powerupRStand);
         }
+    }
+    
+    else if (level ==4)
+    {
+      if(boss_num2 == 0)
+      {
+        if(boss_num < 20)
+        {
+          bossMoveLeft(boss_num);
+          boss_num++; 
+        }
+        boss_num2 = 20;
+      }
+      else
+      {
+        boss_num2--; 
+      }
+      
     }
      // oam_id = oam_spr(platform_one[i]._x, platform_one[i]._y, platform_one[i].sprite, 0x00, oam_id);
    //  
@@ -1263,7 +1315,7 @@ void main() {
         
       }
       // if we have all the pickups, then we win 
-      if (score == 3)
+      if (score == 4)
       {
         //run our winner 
         winner();

@@ -357,6 +357,8 @@ byte sprite_y1 = 100;
 
 byte sprite_y2 = 108;
 
+byte bullet_sprite =  0x7f;
+
 
 // pause variable
 static unsigned char game_paused;
@@ -452,7 +454,10 @@ byte ground= 200;
 byte def_ground = 200; 
 byte jumpHeight = 40;
 byte gravity = 2;
-byte shooting_dx = 2;
+byte shooting_dx = 4;
+byte shooting_dx_left = -4;
+
+byte shoot_count = 3; 
 byte iFrames = 0;
 // used for for loops that require int
 byte num;
@@ -473,6 +478,19 @@ typedef struct Platform{
 };
 //fill our struct with 10 to use
 struct Platform platform_one[10];
+
+//bullet struct
+typedef struct Bullets{
+  byte _x;		// bullet x/y positions
+  byte _y;
+  byte _dx;
+  byte sprite; 
+  bool right; 
+  
+};
+
+//fill our struct with 10 to use
+struct Bullets bullet[10];
 
 typedef struct Thwomps{
   byte _x;		// platforms x/y positions
@@ -557,7 +575,6 @@ void create_platforms(byte x, byte y, byte z)
  // platform_one[z+1].sprite = sprite;
 }
 
-
 void clear_platforms()
 {
   for (num = 0; num<= 10; num++)
@@ -567,6 +584,11 @@ void clear_platforms()
     //platform_one[num].sprite = NULL; 
   }
 }
+
+
+
+
+
 
 //this is our starting level platforms
 void level_one_platforms() {
@@ -608,7 +630,28 @@ void level_three_platforms() {
 }
 
 
+void create_bullet(byte x, byte y, byte z)
+{
+  bullet[z]._x = x;
+  bullet[z]._y = y;
+  if(right)
+  {
+    bullet[z]._dx = shooting_dx; 
+  }
+  else
+  {
+    bullet[z]._dx = shooting_dx_left;
+  }
+  bullet[z].sprite = bullet_sprite;
+  
+}
 
+//void clear_bullet( byte z)
+//{
+//  bullet[z]._x = NULL;
+//  bullet[z]._y = NULL;
+//  bullet[z].sprite = NULL; 
+//}
 
 
 
@@ -1119,7 +1162,7 @@ void main() {
           bossMoveLeft(boss_num);
           boss_num++; 
         }
-        boss_num2 = 20;
+        boss_num2 = 30;
       }
       else
       {
@@ -1161,14 +1204,44 @@ void main() {
        
         
       }
-    if (pad_new & PAD_B && !game_paused)			//Prototype jumping
-      { 
+    if (pad_new & PAD_B && !game_paused)			
+    { 
+      
+      
         sfx_play(8,1);
+        if(right)
+        {
+          create_bullet(actor_x[0]+12, actor_y[0]+5, 0);
+          oam_id = oam_spr(actor_x[0]+12, actor_y[0]+5, bullet_sprite, 0x04, oam_id);
+        }
+        else
+        {
+          create_bullet(actor_x[0]-4, actor_y[0]+5, 0);
+          oam_id = oam_spr(actor_x[0]-4, actor_y[0]+5, bullet_sprite, 0x04, oam_id);
+        }
         
-        shot_dx=shooting_dx;
-       
-        
-      }
+      
+    }
+    
+    bullet[0]._x += bullet[0]._dx; 
+    
+    if (bullet[0]._x >= MAXX)
+    {
+      
+      
+      bullet[0]._x = NULL;
+      bullet[0]._y = NULL;
+      bullet[0].sprite = NULL;
+      
+    }
+    
+    if (bullet[0]._x <= MINX)
+    {
+      bullet[0]._x = NULL;
+      bullet[0]._y = NULL;
+      bullet[0].sprite = NULL;
+      
+    }
     
     //it start was released and then pressed, toggle pause mode
 
@@ -1262,7 +1335,10 @@ void main() {
         actor_y[i] = ground;
         
       }
+      // draw our bullets moving
       
+      bullet[0]._x += bullet[0]._dx;
+      oam_id = oam_spr(bullet[0]._x, bullet[0]._y, bullet_sprite, 0x04, oam_id);
        
       if (thwomp_see(actor_x[i], actor_y[i]))
       {

@@ -116,8 +116,6 @@ extern char demo_sounds[];
 
 //#link "custom_sounds.s"
 extern char custom_sounds[];
-// CREDIT FOR CUSTOM SOUNDS GOES TO TUI
-// https://forums.nesdev.com/viewtopic.php?f=6&t=20147&sid=111cfdada42e9a915581c29a7721757d
 
 
 // create easy to track tile/attr for metasprites 
@@ -236,8 +234,8 @@ byte sprite_y1 = 100;
 byte sprite_y2 = 108;
 
 
-// pause variable
-static unsigned char game_paused;
+
+
 
 // number of actors (4 h/w sprites each)
 #define NUM_ACTORS 1
@@ -249,8 +247,6 @@ byte actor_y[NUM_ACTORS];
 sbyte actor_dx[NUM_ACTORS];
 sbyte actor_dy[NUM_ACTORS];
 
-//shot x delta (signed)
-sbyte shot_dx;
 // thwomp x/y position
 byte thwomp_x;
 byte thwomp_y;
@@ -307,13 +303,11 @@ int level;
 char i;	// actor index
 char oam_id;	// sprite ID
 char pad;// controller flags
-char pad_new;
 
 byte ground= 200;
 byte def_ground = 200; 
 byte jumpHeight = 40;
 byte gravity = 2;
-byte shooting_dx = 2;
 byte iFrames = 0;
 // used for for loops that require int
 byte num;
@@ -795,7 +789,7 @@ void main() {
   //load up our level 1 
   
   levelOne();
-  game_paused=FALSE;
+  
   while (game) {
     levelChange = false;
     // set our minx and maxx values
@@ -812,29 +806,14 @@ void main() {
       
       	if(level == 1)
         {
-          if(!starOne)
-          {
           levelChange = true;
           twoLeft = true;
       	  levelTwo();
-          }
-          else
-          {
-            actor_x[0] == MAXX;
-          }
         }
         else if (level == 2)
         {
-          if(!starTwo)
-          {
-            levelChange = true;
-            levelThree();
-          }
-          else
-          {
-            actor_x[0] == MAXX;
-          }
-          
+          levelChange = true;
+          levelThree();
         }
         
         
@@ -943,8 +922,7 @@ void main() {
     
     
     // 1 player controller setup. 
-      pad_new = pad_trigger(0);
-      pad = pad_state(0);
+      pad = pad_poll(0);
       
       // move actor[i] left/right
       if (pad&PAD_LEFT && actor_x[0]>10) 
@@ -961,8 +939,8 @@ void main() {
       else actor_dx[0]=0;
       
       //Make Cacee Jump
-      
-      if (pad_new & PAD_A & !game_paused &&  actor_y[0] == ground)			//Prototype jumping
+       
+      if (pad & PAD_A &&  actor_y[0] == ground)			//Prototype jumping
       { 
         sfx_play(6,2);
         jump = true; 
@@ -970,30 +948,6 @@ void main() {
        
         
       }
-    if (pad_new & PAD_B && !game_paused)			//Prototype jumping
-      { 
-        sfx_play(8,1);
-        
-        shot_dx=shooting_dx;
-       
-        
-      }
-    
-    //it start was released and then pressed, toggle pause mode
-
-    if(pad_new&PAD_START)
-    {
-      game_paused^=TRUE;
-      music_pause(game_paused);
-    }
-
-    //don't process anything in pause mode, just display latest game state
-    
-    if(game_paused) 
-    {
-      
-      continue;
-    }
       
     
     // if we have are on top of the platform
@@ -1021,7 +975,6 @@ void main() {
 
     }
    
-    
     
     //fall if we are above ground 
     if (actor_y[0] < ground-jumpHeight)

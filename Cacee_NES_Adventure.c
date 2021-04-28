@@ -44,70 +44,7 @@ extern const byte Game_Over_Screen_rle[];
 extern const byte Win_Screen_pal[16];
 extern const byte Win_Screen_rle[];
 
-// Our boss BG
 
-extern const byte Boss1_pal[16];
-extern const byte Boss1_rle[];
-
-extern const byte Boss2_pal[16];
-extern const byte Boss2_rle[];
-
-extern const byte Boss3_pal[16];
-extern const byte Boss3_rle[];
-
-extern const byte Boss4_pal[16];
-extern const byte Boss4_rle[];
-
-extern const byte Boss5_pal[16];
-extern const byte Boss5_rle[];
-
-extern const byte Boss6_pal[16];
-extern const byte Boss6_rle[];
-
-extern const byte Boss7_pal[16];
-extern const byte Boss7_rle[];
-
-extern const byte Boss8_pal[16];
-extern const byte Boss8_rle[];
-
-extern const byte Boss9_pal[16];
-extern const byte Boss9_rle[];
-
-extern const byte Boss10_pal[16];
-extern const byte Boss10_rle[];
-
-extern const byte Boss11_pal[16];
-extern const byte Boss11_rle[];
-
-extern const byte Boss12_pal[16];
-extern const byte Boss12_rle[];
-
-extern const byte Boss13_pal[16];
-extern const byte Boss13_rle[];
-
-extern const byte Boss13_pal[16];
-extern const byte Boss13_rle[];
-
-extern const byte Boss14_pal[16];
-extern const byte Boss14_rle[];
-
-extern const byte Boss15_pal[16];
-extern const byte Boss15_rle[];
-
-extern const byte Boss16_pal[16];
-extern const byte Boss16_rle[];
-
-extern const byte Boss17_pal[16];
-extern const byte Boss17_rle[];
-
-extern const byte Boss18_pal[16];
-extern const byte Boss18_rle[];
-
-extern const byte Boss19_pal[16];
-extern const byte Boss19_rle[];
-
-extern const byte Boss20_pal[16];
-extern const byte Boss20_rle[];
 
 // link the pattern table into CHR ROM
 
@@ -134,71 +71,7 @@ extern const byte Boss20_rle[];
 
 
 
-// Link our boss screens
 
-
-//#link "Boss1.s"
-
-
-//#link "Boss2.s"
-
-
-//#link "Boss3.s"
-
-
-//#link "Boss4.s"
-
-
-//#link "Boss5.s"
-
-
-//#link "Boss6.s"
-
-
-
-//#link "Boss7.s"
-
-
-
-//#link "Boss8.s"
-
-
-//#link "Boss9.s"
-
-
-//#link "Boss10.s"
-
-
-//#link "Boss11.s"
-
-
-//#link "Boss12.s"
-
-
-//#link "Boss13.s"
-
-
-
-//#link "Boss14.s"
-
-
-
-//#link "Boss15.s"
-
-
-//#link "Boss16.s"
-
-
-//#link "Boss17.s"
-
-
-//#link "Boss18.s"
-
-
-//#link "Boss19.s"
-
-
-//#link "Boss20.s"
 
 
 
@@ -363,22 +236,7 @@ byte bullet_sprite =  0x7f;
 // pause variable
 static unsigned char game_paused;
 
-//Array for Boss RLE
-const unsigned char * const Boss_rle_list[]={
-  Boss1_rle, Boss2_rle, Boss3_rle, Boss4_rle, Boss5_rle, 
-  Boss6_rle, Boss7_rle, Boss8_rle, Boss9_rle, Boss10_rle,
-  Boss11_rle, Boss12_rle, Boss13_rle, Boss14_rle, Boss15_rle,
-  Boss16_rle, Boss17_rle, Boss18_rle, Boss19_rle, Boss20_rle
- 
-};
 
-//array for pal screens boss fight
-const unsigned char * const Boss_pal_list[]={
-  Boss1_pal, Boss2_pal, Boss3_pal, Boss4_pal, Boss5_pal, 
-  Boss6_pal, Boss7_pal, Boss8_pal, Boss9_pal, Boss10_pal,
-  Boss11_pal, Boss12_pal, Boss13_pal, Boss14_pal, Boss15_pal,
-  Boss16_pal, Boss17_pal, Boss18_pal, Boss19_pal, Boss20_pal
-};
 
 // number of actors (4 h/w sprites each)
 #define NUM_ACTORS 1
@@ -457,7 +315,10 @@ byte gravity = 2;
 byte shooting_dx = 4;
 byte shooting_dx_left = -4;
 
-byte shoot_count = 3; 
+int shoot_count = 0; 
+
+
+int shoot_max = 1; 
 byte iFrames = 0;
 // used for for loops that require int
 byte num;
@@ -853,17 +714,13 @@ void bossRoom()
   clear_platforms();
   clear_thwomp();
   setup_graphics();
-  show_screen(Boss1_pal, Boss1_rle);
+
   startingSpace(); 
   
   level = 4; 
+}
   
-}
 
-void bossMoveLeft(byte n)
-{
-  show_screen(Boss_pal_list[n], Boss_rle_list[n]);
-}
 void game_reset()
 {
   thwomp_y = def_thwomp_y;
@@ -1155,19 +1012,7 @@ void main() {
     
     else if (level ==4)
     {
-      if(boss_num2 == 0)
-      {
-        if(boss_num < 20)
-        {
-          bossMoveLeft(boss_num);
-          boss_num++; 
-        }
-        boss_num2 = 30;
-      }
-      else
-      {
-        boss_num2--; 
-      }
+      
       
     }
      // oam_id = oam_spr(platform_one[i]._x, platform_one[i]._y, platform_one[i].sprite, 0x00, oam_id);
@@ -1206,25 +1051,32 @@ void main() {
       }
     if (pad_new & PAD_B && !game_paused)			
     { 
-      
-      
+      //if (shoot_count < shoot_max)
+      //{
         sfx_play(8,1);
         if(right)
         {
           create_bullet(actor_x[0]+12, actor_y[0]+5, 0);
-          oam_id = oam_spr(actor_x[0]+12, actor_y[0]+5, bullet_sprite, 0x04, oam_id);
+          oam_id = oam_spr(bullet[0]._x, bullet[0]._y, bullet_sprite, 0x04, oam_id);
+          
         }
         else
         {
           create_bullet(actor_x[0]-4, actor_y[0]+5, 0);
-          oam_id = oam_spr(actor_x[0]-4, actor_y[0]+5, bullet_sprite, 0x04, oam_id);
+          oam_id = oam_spr(bullet[0]._x, bullet[0]._y, bullet_sprite, 0x04, oam_id);
+          
         }
-        
       
+      //}
     }
+        
+        
     
-    bullet[0]._x += bullet[0]._dx; 
     
+    
+    
+    
+      bullet[0]._x += bullet[0]._dx; 
     if (bullet[0]._x >= MAXX)
     {
       
@@ -1232,7 +1084,7 @@ void main() {
       bullet[0]._x = NULL;
       bullet[0]._y = NULL;
       bullet[0].sprite = NULL;
-      
+      shoot_count--;
     }
     
     if (bullet[0]._x <= MINX)
@@ -1240,8 +1092,9 @@ void main() {
       bullet[0]._x = NULL;
       bullet[0]._y = NULL;
       bullet[0].sprite = NULL;
-      
+      shoot_count--;
     }
+    
     
     //it start was released and then pressed, toggle pause mode
 

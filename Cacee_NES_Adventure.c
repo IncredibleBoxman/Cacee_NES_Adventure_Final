@@ -823,6 +823,29 @@ void winner()
 
 // main program
 
+
+void draw_score()
+{
+  oam_id = oam_spr(176, 10, 83, 2, oam_id);
+  oam_id = oam_spr(184, 10, 67, 2, oam_id);
+  oam_id = oam_spr(192, 10, 79, 2, oam_id);
+  oam_id = oam_spr(200, 10, 82, 2, oam_id);
+  oam_id = oam_spr(208, 10, 69, 2, oam_id);
+  oam_id = oam_spr(216, 10, 58, 2, oam_id);
+  oam_id = oam_spr(224, 10, (score/10%10)+48, 2, oam_id);
+  oam_id = oam_spr(232, 10, (score%10)+48, 2, oam_id);
+}
+
+void draw_lives()
+{
+  oam_id = oam_spr(16, 10, 76, 1, oam_id);
+  oam_id = oam_spr(24, 10, 73, 1, oam_id);
+  oam_id = oam_spr(32, 10, 86, 1, oam_id);
+  oam_id = oam_spr(40, 10, 69, 1, oam_id);
+  oam_id = oam_spr(48, 10, 83, 1, oam_id);
+  oam_id = oam_spr(56, 10, 58, 1, oam_id);
+  oam_id = oam_spr(64, 10, (lives%10)+48, 1, oam_id);
+}
 void main() {
   
   
@@ -1257,23 +1280,10 @@ void main() {
     }
 
     //Draws and updates Scoreboard
-    oam_id = oam_spr(176, 10, 83, 2, oam_id);
-    oam_id = oam_spr(184, 10, 67, 2, oam_id);
-    oam_id = oam_spr(192, 10, 79, 2, oam_id);
-    oam_id = oam_spr(200, 10, 82, 2, oam_id);
-    oam_id = oam_spr(208, 10, 69, 2, oam_id);
-    oam_id = oam_spr(216, 10, 58, 2, oam_id);
-    oam_id = oam_spr(224, 10, (score/10%10)+48, 2, oam_id);
-    oam_id = oam_spr(232, 10, (score%10)+48, 2, oam_id);
+    draw_score();
     
     //Draws and updates Lives
-    oam_id = oam_spr(16, 10, 76, 1, oam_id);
-    oam_id = oam_spr(24, 10, 73, 1, oam_id);
-    oam_id = oam_spr(32, 10, 86, 1, oam_id);
-    oam_id = oam_spr(40, 10, 69, 1, oam_id);
-    oam_id = oam_spr(48, 10, 83, 1, oam_id);
-    oam_id = oam_spr(56, 10, 58, 1, oam_id);
-    oam_id = oam_spr(64, 10, (lives%10)+48, 1, oam_id);
+    draw_lives();
     
     // hide rest of sprites
     // if we haven't wrapped oam_id around to 0

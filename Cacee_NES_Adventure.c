@@ -213,11 +213,11 @@ const char PALETTE[32] = {
   0x11,0x30,0x27,0x00,	// background palette 0
   0x1C,0x20,0x2C,0x00,	// background palette 1
   0x00,0x10,0x20,0x00,	// background palette 2
-  0x06,0x16,0x26,0x00,	// background palette 3
+  0x26,0x16,0x26,0x00,	// background palette 3
 
   0x2A,0x16,0x27,0x00,	// sprite palette 0
-  0x00,0x37,0x2C,0x00,	// sprite palette 1
-  0x0D,0x2D,0x27,0x00,	// sprite palette 2
+  0x00,0x19,0x2C,0x00,	// sprite palette 1
+  0x0D,0x16,0x27,0x00,	// sprite palette 2
   0x16,0x0D,0x0D	// sprite palette 3
 };
 
@@ -260,6 +260,8 @@ sbyte thwomp_dy;
 ///default thwomp height
 sbyte def_thwomp_y;
 
+//boss x delta per frame (signed)
+int boss_dx;
 // stars x and y coordinates
 
 byte powerup_x;
@@ -294,6 +296,7 @@ bool starTwo = true;
 bool starThree = true;
 bool onPlatform;
 
+bool boss_left = false;
 //score value
 byte score = 0;
 // lives value
@@ -725,6 +728,7 @@ void game_reset()
 {
   thwomp_y = def_thwomp_y;
   thwomp_dy = 0;
+  boss_dx = 0; 
   first = true;
   starOne = true;
   starTwo = true;
@@ -846,6 +850,62 @@ void draw_lives()
   oam_id = oam_spr(56, 10, 58, 1, oam_id);
   oam_id = oam_spr(64, 10, (lives%10)+48, 1, oam_id);
 }
+
+void draw_boss(sbyte dx)
+{
+  // Boss left side square lines
+  oam_id = oam_spr(200-dx, 150, 163, 3, oam_id);
+  oam_id = oam_spr(200-dx, 142, 163, 3, oam_id);
+  // Boss head
+  oam_id = oam_spr(208-dx, 142, 252, 3, oam_id);
+  oam_id = oam_spr(208-dx, 150, 253, 3, oam_id);
+  oam_id = oam_spr(216-dx, 142, 254, 3, oam_id);
+  oam_id = oam_spr(216-dx, 150, 255, 3, oam_id);
+  //Boss top side square lines
+  oam_id = oam_spr(208-dx, 134, 161, 3, oam_id);
+  oam_id = oam_spr(216-dx, 134, 161, 3, oam_id);
+  
+  // Boss right side square lines
+  oam_id = oam_spr(224-dx, 150, 162, 3, oam_id);
+  oam_id = oam_spr(224-dx, 142, 162, 3, oam_id);
+  
+  //Boss UFO HEAD BASE
+  oam_id = oam_spr(224-dx, 158, 1, 1, oam_id);
+  oam_id = oam_spr(216-dx, 158, 1, 1, oam_id);
+  oam_id = oam_spr(208-dx, 158, 1, 1, oam_id);
+  oam_id = oam_spr(200-dx, 158, 1, 1, oam_id);
+  
+  //Boss UFO 2nd tier
+  oam_id = oam_spr(224-dx, 166, 1, 1, oam_id);
+  oam_id = oam_spr(216-dx, 166, 1, 1, oam_id);
+  oam_id = oam_spr(208-dx, 166, 1, 1, oam_id);
+  oam_id = oam_spr(200-dx, 166, 1, 1, oam_id);
+  oam_id = oam_spr(192-dx, 166, 1, 1, oam_id);
+  oam_id = oam_spr(232-dx, 166, 1, 1, oam_id);
+  
+  //Boss UFO 3rd tier 
+  oam_id = oam_spr(224-dx, 174, 1, 1, oam_id);
+  oam_id = oam_spr(216-dx, 174, 1, 1, oam_id);
+  oam_id = oam_spr(208-dx, 174, 1, 1, oam_id);
+  oam_id = oam_spr(200-dx, 174, 1, 1, oam_id);
+  oam_id = oam_spr(192-dx, 174, 1, 1, oam_id);
+  oam_id = oam_spr(232-dx, 174, 1, 1, oam_id);
+  oam_id = oam_spr(184-dx, 174, 1, 1, oam_id);
+  oam_id = oam_spr(240-dx, 174, 1, 1, oam_id);
+  
+  //boss "fire" left side
+  oam_id = oam_spr(192-dx, 182, 169, 2, oam_id);
+  oam_id = oam_spr(200-dx, 182, 169, 2, oam_id);
+  oam_id = oam_spr(184-dx, 190, 169, 2, oam_id);
+  oam_id = oam_spr(192-dx, 190, 169, 2, oam_id);
+  
+  //boss "fire" right side
+  
+  oam_id = oam_spr(232-dx, 182, 170, 2, oam_id);
+  oam_id = oam_spr(240-dx, 182, 170, 2, oam_id);
+  oam_id = oam_spr(232-dx, 190, 170, 2, oam_id);
+  oam_id = oam_spr(240-dx, 190, 170, 2, oam_id);
+}
 void main() {
   
   
@@ -854,6 +914,7 @@ void main() {
   //lives = 3; 
   boss_num = 0;
   boss_num2 = 0;
+  boss_dx = 0;
  
  
   
@@ -880,6 +941,7 @@ void main() {
   //load up our level 1 
   
   levelOne();
+  
   game_paused=FALSE;
   while (game) {
     levelChange = false;
@@ -1278,6 +1340,17 @@ void main() {
       
       
     }
+    
+    draw_boss(boss_dx);
+    
+    if ( boss_left)
+      boss_dx -= gravity;
+      if (boss_dx > 167)
+        boss_left = true;
+    else if (!boss_left)
+      boss_dx += gravity;
+      if (boss_dx < 10)
+        boss_left = false;
 
     //Draws and updates Scoreboard
     draw_score();

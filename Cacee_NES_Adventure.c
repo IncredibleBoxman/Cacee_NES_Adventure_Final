@@ -1086,13 +1086,14 @@ void main() {
     
     if(level == 1)
     {
-      for (i = 0; i<= 5; i++)
-      {
+      // LEGACY CODE, HARDCODED PLATFORMS INSTEAD OF RLE
+     // for (i = 0; i<= 5; i++)
+     // {
       // add 17 to y in order for us to stand on top of platform
        //oam_id = oam_spr(platform_one[i]._x, platform_one[i]._y+17, platform_one[i].sprite, 0x01, oam_id);
        //oam_id = oam_spr(platform_one[i]._x, platform_one[i]._y+17, platform_one[i].sprite, 0x01, oam_id);
         
-      }
+     // }
       oam_id = oam_meta_spr(thwomp_x, thwomp_y, oam_id, thwompRStand);
       if (powerup_collision())
       {
@@ -1108,15 +1109,16 @@ void main() {
     
     else if(level == 2)
     {
-      for (i = 0; i<= 5; i++)
-      {
+      // LEGACY CODE, HARDCODED PLATFORMS INSTEAD OF RLE
+      //for (i = 0; i<= 5; i++)
+     // {
       // add 17 to y in order for us to stand on top of platform
         //oam_id = oam_spr(platform_one[i]._x, platform_one[i]._y+17, platform_one[i].sprite, 0x01, oam_id);
         //oam_id = oam_spr(platform_one[i]._x, platform_one[i]._y+17, platform_one[i].sprite, 0x01, oam_id);
         
         
         
-      }
+    //  }
       oam_id = oam_meta_spr(thwomp_x, thwomp_y, oam_id, thwompRStand);
       
       if (powerup_collision())
@@ -1133,13 +1135,15 @@ void main() {
     
     else if(level == 3)
     {
-      for (i = 0; i<= 9; i++)
-      {
+      
+      // LEGACY CODE, HARDCODED PLATFORMS INSTEAD OF RLE
+     // for (i = 0; i<= 9; i++)
+      //{
       // add 17 to y in order for us to stand on top of platform
        //oam_id = oam_spr(platform_one[i]._x, platform_one[i]._y+17, platform_one[i].sprite, 0x01, oam_id);
         //oam_id = oam_spr(platform_one[i]._x, platform_one[i]._y+17, platform_one[i].sprite, 0x01, oam_id);
         
-      }
+     // }
       oam_id = oam_meta_spr(thwomp_x, thwomp_y, oam_id, thwompRStand);
         //check if we've grabbed the star yet
       
@@ -1198,10 +1202,13 @@ void main() {
     {
       
       boss_dx = boss_dx;
-      // phase 1 spawn platforms
+      //  spawn platforms if boss 2 is false (its always false except when
+      // boss phases change
         if (!boss2)
         {
           level_four_platforms();
+          // This creates our RLE platforms, but only does this once so 
+          // it's not constantly flashing. 
           if (boss_screen == 0)
           {
             show_screen(Boss_Screen_pal, Boss_Screen_rle);
@@ -1211,6 +1218,7 @@ void main() {
       // phase 1 break
       if (score >= 10 && boss_phase_1)
       {
+        // sets variables for next phase and removes RLE platforms once so its not flashing
         boss_count = 0;
         boss_phase_1 = false;
         boss2 = true;
@@ -1220,6 +1228,7 @@ void main() {
         //phase 2 break
       else if ( score>= 20 && boss_phase_2)
       {
+        // sets variables for next phase and removes RLE platforms once so its not flashing
         show_screen(Boss_Screen2_pal, Boss_Screen2_rle);
         boss_count = 0;
         boss_phase_2 = false; 

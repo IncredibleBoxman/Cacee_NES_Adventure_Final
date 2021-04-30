@@ -109,6 +109,11 @@ extern char my_lost_soul_danmaku_music_data[];
 // http://forums.famitracker.com/viewtopic.php?f=8&t=4865&p=23965&hilit=sad+song#p23965
 
 
+//#link "Shatterhand.s"
+extern char Shatterhand_music_data[];
+
+
+
 
 
 
@@ -741,6 +746,10 @@ void bossRoom()
   clear_platforms();
   clear_thwomp();
   setup_graphics();
+  music_stop();
+  //famitone_init(my_lost_soul_danmaku_music_data);
+  famitone_init(Shatterhand_music_data);
+  music_play(0);
   show_screen(Boss_Screen_pal, Boss_Screen_rle);
   level_four_platforms();
   create_thwomp(200, 120);
@@ -758,6 +767,8 @@ void game_reset()
   thwomp_dy = 0;
   boss_dx = 0; 
   boss_count = 0;
+  boss_phase_1 = true;
+  boss_phase_2 = true;
   first = true;
   starOne = true;
   starTwo = true;
@@ -777,7 +788,7 @@ void game_over()
  
   music_stop();
   //famitone_init(my_lost_soul_danmaku_music_data);
-  famitone_init(rickroll_music_data);
+  famitone_init(my_lost_soul_danmaku_music_data);
   music_play(0);
   setup_graphics();
   ppu_off();

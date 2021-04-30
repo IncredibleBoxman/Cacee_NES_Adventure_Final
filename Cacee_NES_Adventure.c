@@ -44,6 +44,9 @@ extern const byte Game_Over_Screen_rle[];
 extern const byte Win_Screen_pal[16];
 extern const byte Win_Screen_rle[];
 
+extern const byte Boss_Screen_pal[16];
+extern const byte Boss_Screen_rle[];
+
 
 
 // link the pattern table into CHR ROM
@@ -63,6 +66,8 @@ extern const byte Win_Screen_rle[];
 
 
 //#link "Test_Screen3.s"
+
+//#link "Boss_screen.s"
 
 
 //#link "Game_Over_Screen.s"
@@ -187,7 +192,7 @@ thwomp(thwompRStand, 0xc8, 3);
 
 powerup(powerupRStand, 0xd0, 2);
 
-door(doorRStand, 0x00, 1);
+door(doorRStand, 0xc4, 1);
 
 // define a 2x2 metasprites
 const unsigned char cacee[]={
@@ -281,6 +286,7 @@ byte boss_head;
 //boss see byte
 
 byte boss_see;
+bool boss_phase_1 = true;
 
 // stars x and y coordinates
 
@@ -515,11 +521,11 @@ void level_three_platforms() {
 
 void level_four_platforms()
 {
-  create_platforms(70, 175, 0);
+  create_platforms(118, 175, 0);
   
-  create_platforms(105, 145, 2);
+  create_platforms(86, 145, 2);
   
-  create_platforms(140, 120, 4);
+  create_platforms(150, 145, 4);
 }
 
 void create_bullet(byte x, byte y, byte z)
@@ -746,7 +752,7 @@ void bossRoom()
   clear_platforms();
   clear_thwomp();
   setup_graphics();
-  show_screen(Test_Screen_pal, Test_Screen_rle);
+  show_screen(Boss_Screen_pal, Boss_Screen_rle);
   level_four_platforms();
   create_thwomp(200, 120);
   startingSpace(); 
@@ -1080,6 +1086,7 @@ void main() {
       if (starOne)
       {
         oam_id = oam_meta_spr(powerup_x, powerup_y, oam_id, powerupRStand);
+        oam_id = oam_meta_spr(MAXX+8, 200, oam_id, doorRStand); 
       }
     }
     
@@ -1104,6 +1111,7 @@ void main() {
       if (starTwo)
         {
           oam_id = oam_meta_spr(powerup_x, powerup_y, oam_id, powerupRStand);
+          oam_id = oam_meta_spr(MAXX+8, 200, oam_id, doorRStand); 
         }
     }
     
@@ -1128,6 +1136,7 @@ void main() {
         {
           
           oam_id = oam_meta_spr(powerup_x, powerup_y, oam_id, powerupRStand);
+          oam_id = oam_meta_spr(MAXX+8, 200, oam_id, doorRStand); 
         }
     }
     
@@ -1154,9 +1163,10 @@ void main() {
       boss_dx = boss_dx;
      
         
-      if (actor_x[0] >= MAXX)
+      if (score >= 10 && boss_phase_1)
       {
         boss_count = 0;
+        boss_phase_1 = false;
       }
     }
     else
@@ -1393,7 +1403,7 @@ void main() {
         
       }
       // if we have all the pickups, then we win 
-      if (score == 4)
+      if (score == 30)
       {
         //run our winner 
         winner();

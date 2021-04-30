@@ -264,7 +264,7 @@ sbyte actor_dx[NUM_ACTORS];
 sbyte actor_dy[NUM_ACTORS];
 
 //shot x delta (signed)
-sbyte shot_dx;
+
 // thwomp x/y position
 byte thwomp_x;
 byte thwomp_y;
@@ -287,6 +287,7 @@ byte boss_head;
 
 byte boss_see;
 bool boss_phase_1 = true;
+bool boss_phase_2 = true;
 
 // stars x and y coordinates
 
@@ -344,10 +345,7 @@ byte gravity = 2;
 byte shooting_dx = 4;
 byte shooting_dx_left = -4;
 
-int shoot_count = 0; 
 
-
-int shoot_max = 1; 
 byte iFrames = 0;
 // used for for loops that require int
 byte num;
@@ -356,9 +354,6 @@ byte collision;
 
 //Used for moving boss
 
-byte boss_num;
-
-byte boss_num2;
 //platform struct
 typedef struct Platform{
   byte _x;		// platforms x/y positions
@@ -382,14 +377,8 @@ typedef struct Bullets{
 //fill our struct with 10 to use
 struct Bullets bullet[10];
 
-typedef struct Thwomps{
-  byte _x;		// platforms x/y positions
-  byte _y;		
-  byte meta_sprite; 
-  
-};
 
-struct Thwomps thwomp[10];
+
 
 void setup_graphics() {
   // clear sprites
@@ -759,6 +748,8 @@ void bossRoom()
   
   level = 4; 
 }
+
+
   
 
 void game_reset()
@@ -953,8 +944,7 @@ void main() {
  
   //score = 0;
   //lives = 3; 
-  boss_num = 0;
-  boss_num2 = 0;
+  
   boss_dx = 0;
  
  
@@ -1139,12 +1129,16 @@ void main() {
           oam_id = oam_meta_spr(MAXX+8, 200, oam_id, doorRStand); 
         }
     }
-    
+    //boss level
     else if (level ==4)
     {
+      
+      //draw our boss and move it with boss_dx
       boss_head = draw_boss(boss_dx);
       
-      
+      // our boss uses a moving thwomp to attack! Depending on if 
+      // thwomp sees us or not, changes the X. If does't see us then
+      // it follows boss, if it does see us then it crashes down.
       if (!thwomp_see(actor_x[0], actor_y[0]))
       {
         thwomp_x = boss_head; 
@@ -1157,20 +1151,27 @@ void main() {
       
       oam_id = oam_meta_spr(thwomp_x, thwomp_y, oam_id, thwompRStand);
       
-      
+      //if our count is 7 then boss will take a break so you can shoot him.
       if (boss_count == 7)
     {
       boss_dx = boss_dx;
      
-        
+      // phase 1 break
       if (score >= 10 && boss_phase_1)
       {
         boss_count = 0;
         boss_phase_1 = false;
       }
+        //phase 2 break
+      else if ( score>= 20 && boss_phase_2)
+      {
+        boss_count = 0;
+        boss_phase_2 = false; 
+      }
     }
     else
     {
+      // move our boss if he needs to move
     if ( boss_left )
       boss_dx -= gravity;
       if (boss_dx > 167)
@@ -1189,11 +1190,13 @@ void main() {
       
       
     }
+    
+    //LEGACY CODE
      // oam_id = oam_spr(platform_one[i]._x, platform_one[i]._y, platform_one[i].sprite, 0x00, oam_id);
    //  
     // displays our current level for debug purposes
     //oam_id = oam_spr(100, 100, 48+level, level, oam_id);
-    
+    // END LEGACY CODE
     
     // 1 player controller setup. 
       pad_new = pad_trigger(0);
@@ -1223,19 +1226,20 @@ void main() {
        
         
       }
-    if (pad_new & PAD_B && !game_paused && shoot_count < shoot_max)			
+    //Shoot our guns pew pew
+    if (pad_new & PAD_B && !game_paused)			
     { 
       
-      if (shoot_count < shoot_max)
-      {
+      //play our gunshot sound
         sfx_play(8,1);
-        
+        //if we are facing right, spawn bullet on right
         if(right)
         {
           create_bullet(actor_x[0]+12, actor_y[0]+5, 0);
           oam_id = oam_spr(bullet[0]._x, bullet[0]._y, bullet_sprite, 0x04, oam_id);
           
         }
+      //if we are facing left, spawn bullet on left. 
         else
         {
           create_bullet(actor_x[0]-4, actor_y[0]+5, 0);
@@ -1243,7 +1247,7 @@ void main() {
           
         }
       
-      }
+      
     }
         
         
@@ -1402,7 +1406,7 @@ void main() {
         
         
       }
-      // if we have all the pickups, then we win 
+      // if we have a score of 30, then we win 
       if (score == 30)
       {
         //run our winner 
@@ -1416,8 +1420,10 @@ void main() {
     }
     
     
-    
+    //move bulle
       bullet[0]._x += bullet[0]._dx; 
+    
+    //if bullet has reached MAXX, despawn
     if (bullet[0]._x >= MAXX)
     {
       
@@ -1425,18 +1431,18 @@ void main() {
       bullet[0]._x = NULL;
       bullet[0]._y = NULL;
       bullet[0].sprite = NULL;
-      shoot_count--;
+      
     }
-    
+    // if bullet has reached MINX, despawn
     if (bullet[0]._x <= MINX)
     {
       bullet[0]._x = NULL;
       bullet[0]._y = NULL;
       bullet[0].sprite = NULL;
-      shoot_count--;
+      
     }
     
-    
+    // IF bullet has hit the boss in the head, DESPAWN and add score
     if (bullet[0]._x <= boss_head & bullet[0]._y == 142 || bullet[0]._x <= boss_head & bullet[0]._y == 150)
     {
       
@@ -1444,7 +1450,7 @@ void main() {
       bullet[0]._x = NULL;
       bullet[0]._y = NULL;
       bullet[0].sprite = NULL;
-      shoot_count--;
+      
       score++;
     }
     

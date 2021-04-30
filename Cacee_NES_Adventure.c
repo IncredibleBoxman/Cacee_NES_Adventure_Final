@@ -778,12 +778,16 @@ void bossRoom()
 
 void game_reset()
 {
+  
   thwomp_y = def_thwomp_y;
   thwomp_dy = 0;
   boss_dx = 0; 
   boss_count = 0;
   boss_phase_1 = true;
   boss_phase_2 = true;
+  boss_screen = 0; 
+  boss1 = true;
+  boss2 = false; 
   first = true;
   starOne = true;
   starTwo = true;

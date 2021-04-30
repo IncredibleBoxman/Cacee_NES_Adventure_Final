@@ -1206,11 +1206,12 @@ void main() {
       // boss phases change
         if (!boss2)
         {
-          level_four_platforms();
+          
           // This creates our RLE platforms, but only does this once so 
           // it's not constantly flashing. 
           if (boss_screen == 0)
           {
+            level_four_platforms();
             show_screen(Boss_Screen_pal, Boss_Screen_rle);
             boss_screen = 1; 
           }

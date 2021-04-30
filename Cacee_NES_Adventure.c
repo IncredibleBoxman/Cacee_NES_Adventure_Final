@@ -262,6 +262,12 @@ sbyte def_thwomp_y;
 
 //boss x delta per frame (signed)
 int boss_dx;
+//boss counter
+int boss_count = 0;
+
+//boss head bytes
+byte boss_head;
+
 // stars x and y coordinates
 
 byte powerup_x;
@@ -529,7 +535,8 @@ void platform_collision(){
   for( num = 0; num <= 20; num++)
   {
     //checks if actor has collided with our platforms
-    if(((platform_one[num]._x >= actor_x[0]-4 && platform_one[num]._x <= actor_x[0]+8)&& (platform_one[num]._y >= actor_y[0]-2 && platform_one[num]._y <= actor_y[0]+4))) //collision detected
+    if(((platform_one[num]._x >= actor_x[0]-4 && platform_one[num]._x <= actor_x[0]+8)
+        && (platform_one[num]._y >= actor_y[0]-2 && platform_one[num]._y <= actor_y[0]+4))) //collision detected
     {
       collision = platform_one[num]._y;
       onPlatform = true;
@@ -851,7 +858,7 @@ void draw_lives()
   oam_id = oam_spr(64, 10, (lives%10)+48, 1, oam_id);
 }
 
-void draw_boss(sbyte dx)
+byte draw_boss(sbyte dx)
 {
   // Boss left side square lines
   oam_id = oam_spr(200-dx, 150, 163, 3, oam_id);
@@ -905,6 +912,7 @@ void draw_boss(sbyte dx)
   oam_id = oam_spr(240-dx, 182, 170, 2, oam_id);
   oam_id = oam_spr(232-dx, 190, 170, 2, oam_id);
   oam_id = oam_spr(240-dx, 190, 170, 2, oam_id);
+  return 208-dx;
 }
 void main() {
   
@@ -944,6 +952,7 @@ void main() {
   
   game_paused=FALSE;
   while (game) {
+    
     levelChange = false;
     // set our minx and maxx values
     MINX = 10;
@@ -1134,11 +1143,13 @@ void main() {
        
         
       }
-    if (pad_new & PAD_B && !game_paused)			
+    if (pad_new & PAD_B && !game_paused && shoot_count < shoot_max)			
     { 
-      //if (shoot_count < shoot_max)
-      //{
+      
+      if (shoot_count < shoot_max)
+      {
         sfx_play(8,1);
+        
         if(right)
         {
           create_bullet(actor_x[0]+12, actor_y[0]+5, 0);
@@ -1152,7 +1163,7 @@ void main() {
           
         }
       
-      //}
+      }
     }
         
         
@@ -1212,7 +1223,7 @@ void main() {
       
     }
     // if we are not on top of the platform, and our actor is higher than default ground, and our actor 
-    else if ((!onPlatform && actor_y[0] < def_ground && actor_y[0] < ground-jumpHeight) || (actor_x[0]-4 > platform_one[0]._x) || (actor_x[0]+4 < platform_one[0]._x) )
+    else if ((!onPlatform && actor_y[0] < def_ground ) || (actor_x[0]-4 > platform_one[0]._x) || (actor_x[0]+4 < platform_one[0]._x) )
     {
       // set ground back to default
       if (!jump)
@@ -1261,7 +1272,7 @@ void main() {
       oam_id = oam_meta_spr(actor_x[i], actor_y[i], oam_id, caceeRunSeq[runseq]);
       actor_x[i] += actor_dx[i];
       actor_y[i] += actor_dy[i];
-      
+       
       }
       if(actor_y[i] <= ground)
       {
@@ -1341,17 +1352,42 @@ void main() {
       
     }
     
-    draw_boss(boss_dx);
-    
-    if ( boss_left)
+    boss_head = draw_boss(boss_dx);
+    if (bullet[0]._x <= boss_head & bullet[0]._y == 142 || bullet[0]._x <= boss_head & bullet[0]._y == 150)
+    {
+      
+      
+      bullet[0]._x = NULL;
+      bullet[0]._y = NULL;
+      bullet[0].sprite = NULL;
+      shoot_count--;
+      score++;
+    }
+    if (boss_count == 7)
+    {
+      boss_dx = boss_dx;
+      if (actor_x[0] >= MAXX)
+      {
+        boss_count = 0;
+      }
+    }
+    else
+    {
+    if ( boss_left )
       boss_dx -= gravity;
       if (boss_dx > 167)
+      {
         boss_left = true;
-    else if (!boss_left)
+        boss_count = boss_count +1; 
+      }
+    else if (!boss_left )
       boss_dx += gravity;
       if (boss_dx < 10)
+      {
         boss_left = false;
-
+        boss_count = boss_count +1; 
+      }
+    }
     //Draws and updates Scoreboard
     draw_score();
     

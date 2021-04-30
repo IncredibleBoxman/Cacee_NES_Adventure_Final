@@ -159,6 +159,14 @@ const unsigned char name[]={\
         8,      0,      (code)+2,   pal, \
         8,      8,      (code)+3,   pal, \
         128};
+
+#define door(name,code,pal)\
+const unsigned char name[]={\
+        0,      0,      (code)+0,   pal, \
+        0,      8,      (code)+1,   pal, \
+        8,      0,      (code)+2,   pal, \
+        8,      8,      (code)+3,   pal, \
+        128};
 cacee(caceeRStand, 0xd8, 0);
 cacee(caceeRRun1, 0xdc, 0);
 cacee(caceeRRun2, 0xe0, 0);
@@ -178,6 +186,8 @@ cacee_flip(caceeLSad, 0xf0, 0);
 thwomp(thwompRStand, 0xc8, 3);
 
 powerup(powerupRStand, 0xd0, 2);
+
+door(doorRStand, 0x00, 1);
 
 // define a 2x2 metasprites
 const unsigned char cacee[]={
@@ -267,6 +277,10 @@ int boss_count = 0;
 
 //boss head bytes
 byte boss_head;
+
+//boss see byte
+
+byte boss_see;
 
 // stars x and y coordinates
 
@@ -499,6 +513,14 @@ void level_three_platforms() {
   
 }
 
+void level_four_platforms()
+{
+  create_platforms(70, 175, 0);
+  
+  create_platforms(105, 145, 2);
+  
+  create_platforms(140, 120, 4);
+}
 
 void create_bullet(byte x, byte y, byte z)
 {
@@ -724,7 +746,9 @@ void bossRoom()
   clear_platforms();
   clear_thwomp();
   setup_graphics();
-
+  show_screen(Test_Screen_pal, Test_Screen_rle);
+  level_four_platforms();
+  create_thwomp(200, 120);
   startingSpace(); 
   
   level = 4; 
@@ -736,6 +760,7 @@ void game_reset()
   thwomp_y = def_thwomp_y;
   thwomp_dy = 0;
   boss_dx = 0; 
+  boss_count = 0;
   first = true;
   starOne = true;
   starTwo = true;
@@ -914,6 +939,8 @@ byte draw_boss(sbyte dx)
   oam_id = oam_spr(240-dx, 190, 170, 2, oam_id);
   return 208-dx;
 }
+
+
 void main() {
   
   
@@ -1106,6 +1133,49 @@ void main() {
     
     else if (level ==4)
     {
+      boss_head = draw_boss(boss_dx);
+      
+      
+      if (!thwomp_see(actor_x[0], actor_y[0]))
+      {
+        thwomp_x = boss_head; 
+      }
+      else
+      {
+        boss_see = boss_head;
+        thwomp_x = boss_see;
+      }
+      
+      oam_id = oam_meta_spr(thwomp_x, thwomp_y, oam_id, thwompRStand);
+      
+      
+      if (boss_count == 7)
+    {
+      boss_dx = boss_dx;
+     
+        
+      if (actor_x[0] >= MAXX)
+      {
+        boss_count = 0;
+      }
+    }
+    else
+    {
+    if ( boss_left )
+      boss_dx -= gravity;
+      if (boss_dx > 167)
+      {
+        boss_left = true;
+        boss_count = boss_count +1; 
+      }
+    else if (!boss_left )
+      boss_dx += gravity;
+      if (boss_dx < 10)
+      {
+        boss_left = false;
+        boss_count = boss_count +1; 
+      }
+    }
       
       
     }
@@ -1172,24 +1242,7 @@ void main() {
     
     
     
-      bullet[0]._x += bullet[0]._dx; 
-    if (bullet[0]._x >= MAXX)
-    {
       
-      
-      bullet[0]._x = NULL;
-      bullet[0]._y = NULL;
-      bullet[0].sprite = NULL;
-      shoot_count--;
-    }
-    
-    if (bullet[0]._x <= MINX)
-    {
-      bullet[0]._x = NULL;
-      bullet[0]._y = NULL;
-      bullet[0].sprite = NULL;
-      shoot_count--;
-    }
     
     
     //it start was released and then pressed, toggle pause mode
@@ -1352,7 +1405,28 @@ void main() {
       
     }
     
-    boss_head = draw_boss(boss_dx);
+    
+    
+      bullet[0]._x += bullet[0]._dx; 
+    if (bullet[0]._x >= MAXX)
+    {
+      
+      
+      bullet[0]._x = NULL;
+      bullet[0]._y = NULL;
+      bullet[0].sprite = NULL;
+      shoot_count--;
+    }
+    
+    if (bullet[0]._x <= MINX)
+    {
+      bullet[0]._x = NULL;
+      bullet[0]._y = NULL;
+      bullet[0].sprite = NULL;
+      shoot_count--;
+    }
+    
+    
     if (bullet[0]._x <= boss_head & bullet[0]._y == 142 || bullet[0]._x <= boss_head & bullet[0]._y == 150)
     {
       
@@ -1363,31 +1437,7 @@ void main() {
       shoot_count--;
       score++;
     }
-    if (boss_count == 7)
-    {
-      boss_dx = boss_dx;
-      if (actor_x[0] >= MAXX)
-      {
-        boss_count = 0;
-      }
-    }
-    else
-    {
-    if ( boss_left )
-      boss_dx -= gravity;
-      if (boss_dx > 167)
-      {
-        boss_left = true;
-        boss_count = boss_count +1; 
-      }
-    else if (!boss_left )
-      boss_dx += gravity;
-      if (boss_dx < 10)
-      {
-        boss_left = false;
-        boss_count = boss_count +1; 
-      }
-    }
+    
     //Draws and updates Scoreboard
     draw_score();
     
